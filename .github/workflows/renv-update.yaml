@@ -3,7 +3,7 @@ name: renv-update
 
 on:
   schedule:
-    - cron: "17 19 * * 0"
+    - cron: "59 17 * * 4"
   workflow_dispatch:
 
 permissions:
