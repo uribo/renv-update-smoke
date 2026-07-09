@@ -61,6 +61,7 @@ jobs:
           )
           renv::restore(prompt = FALSE)
           renv::update(prompt = FALSE, lock = TRUE)
+          renv::snapshot(prompt = FALSE)
           RSCRIPT
 
           if git diff --quiet -- renv.lock renv/activate.R; then
