@@ -67,7 +67,13 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         if: steps.lockfile.outputs.has_lockfile == 'true'
         with:
-          use-public-rspm: true
+          # PROBE 3 (2026-09-05): no public RSPM. Probe 2 showed that clearing
+          # RENV_CONFIG_REPOS_OVERRIDE fixes the recorded repository URL but
+          # leaves the per-package Repository field pointing at the PPM binary
+          # URL, because this input also writes that repository into
+          # Rprofile.site and pak installs from there. Measure what resolving
+          # everything from CRAN costs.
+          use-public-rspm: false
 
       - name: Install renv tooling
         if: steps.lockfile.outputs.has_lockfile == 'true'
@@ -85,10 +91,6 @@ jobs:
         if: steps.lockfile.outputs.has_lockfile == 'true'
         run: |
           Rscript - <<'RSCRIPT'
-          # PROBE 2 (2026-09-05): options(repos) alone is not enough.
-          # use-public-rspm sets RENV_CONFIG_REPOS_OVERRIDE, which renv honours
-          # ahead of options(repos), so the first probe still wrote PPM into the
-          # lockfile. Clear the override as well.
           Sys.unsetenv("RENV_CONFIG_REPOS_OVERRIDE")
           options(repos = c(CRAN = "https://cloud.r-project.org"))
           renv::restore(prompt = FALSE)
