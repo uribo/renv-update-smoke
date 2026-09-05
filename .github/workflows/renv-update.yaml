@@ -85,8 +85,11 @@ jobs:
         if: steps.lockfile.outputs.has_lockfile == 'true'
         run: |
           Rscript - <<'RSCRIPT'
-          # PROBE (2026-09-05): pin CRAN instead of the runner's PPM mirror, to
-          # measure what the pin costs before propagating it to the template.
+          # PROBE 2 (2026-09-05): options(repos) alone is not enough.
+          # use-public-rspm sets RENV_CONFIG_REPOS_OVERRIDE, which renv honours
+          # ahead of options(repos), so the first probe still wrote PPM into the
+          # lockfile. Clear the override as well.
+          Sys.unsetenv("RENV_CONFIG_REPOS_OVERRIDE")
           options(repos = c(CRAN = "https://cloud.r-project.org"))
           renv::restore(prompt = FALSE)
           renv::update(prompt = FALSE, lock = TRUE)
