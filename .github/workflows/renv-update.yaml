@@ -85,12 +85,9 @@ jobs:
         if: steps.lockfile.outputs.has_lockfile == 'true'
         run: |
           Rscript - <<'RSCRIPT'
-          options(
-            repos = c(CRAN = Sys.getenv(
-              "RSPM",
-              "https://packagemanager.posit.co/cran/latest"
-            ))
-          )
+          # PROBE (2026-09-05): pin CRAN instead of the runner's PPM mirror, to
+          # measure what the pin costs before propagating it to the template.
+          options(repos = c(CRAN = "https://cloud.r-project.org"))
           renv::restore(prompt = FALSE)
           renv::update(prompt = FALSE, lock = TRUE)
           # Make the lockfile write explicit. With pak enabled, update(lock =
